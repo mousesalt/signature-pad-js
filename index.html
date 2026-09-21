@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SmoothSignaturePad Demo</title>
+<style>
+:root { color-scheme: dark; font-family: system-ui, sans-serif; background: #0d1117; color: #f4f7fb; }
+body { margin: 0; padding: 24px; }
+main { max-width: 920px; margin: auto; }
+.panel { border: 1px solid #303844; border-radius: 16px; padding: 18px; background: #151b23; }
+.canvas-wrap { background: #fff; border-radius: 10px; overflow: hidden; touch-action: none; }
+canvas { display:block; width:100%; height:330px; }
+.controls { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+button, input { min-height:38px; border:1px solid #303844; border-radius:9px; background:#1c2430; color:#fff; padding:7px 11px; }
+label { display:flex; gap:6px; align-items:center; font-size:13px; }
+output { color:#9aa6b5; font-size:12px; }
+pre { white-space:pre-wrap; max-height:180px; overflow:auto; font-size:11px; color:#b8c4d4; }
+</style>
+</head>
+<body>
+<main>
+<h1>SmoothSignaturePad</h1>
+<p>Pressure-aware, touch friendly, responsive and dependency-free.</p>
+<div class="panel">
+  <div class="canvas-wrap"><canvas id="pad"></canvas></div>
+  <div class="controls">
+    <label>Pen <input id="pen" type="color" value="#111111"></label>
+    <label>Background <input id="bg" type="color" value="#ffffff"></label>
+    <label>Sensitivity <input id="sensitivity" type="range" min="0" max="1" step="0.01" value="0.72"><output id="sensitivityOut">0.72</output></label>
+    <button id="clear">Clear</button>
+    <button id="png">PNG</button>
+    <button id="jpeg">JPEG</button>
+    <button id="svg">SVG</button>
+    <button id="saveData">Save stroke JSON</button>
+    <button id="loadData">Load stroke JSON</button>
+  </div>
+  <p id="status" aria-live="polite">Empty</p>
+  <pre id="data"></pre>
+</div>
+</main>
+<script src="signature-pad.js"></script>
+<script>
+const canvas = document.getElementById('pad');
+const pad = new SmoothSignaturePad(canvas, {
+  penColor: '#111111',
+  backgroundColor: '#ffffff',
+  minWidth: 0.8,
+  maxWidth: 4.2,
+  sensitivity: 0.72,
+  smoothing: 0.58,
+  onBegin: () => status.textContent = 'Signing…',
+  onEnd: () => status.textContent = pad.isEmpty() ? 'Empty' : 'Signed'
+});
+const status = document.getElementById('status');
+const data = document.getElementById('data');
+const pen = document.getElementById('pen');
+const bg = document.getElementById('bg');
+const sensitivity = document.getElementById('sensitivity');
+pen.addEventListener('input', e => pad.setOptions({ penColor: e.target.value }));
+bg.addEventListener('input', e => pad.setOptions({ backgroundColor: e.target.value }));
+sensitivity.addEventListener('input', e => { pad.setOptions({ sensitivity: Number(e.target.value) }); document.getElementById('sensitivityOut').value = e.target.value; });
+document.getElementById('clear').onclick = () => { pad.clear(); status.textContent = 'Empty'; data.textContent = ''; };
+function download(blob, name) { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+document.getElementById('png').onclick = async () => download(await pad.toBlob('image/png'), 'signature.png');
+document.getElementById('jpeg').onclick = async () => download(await pad.toBlob('image/jpeg', 0.92), 'signature.jpg');
+document.getElementById('svg').onclick = () => download(new Blob([pad.toSVG()], {type:'image/svg+xml'}), 'signature.svg');
+document.getElementById('saveData').onclick = () => data.textContent = JSON.stringify(pad.toData(), null, 2);
+document.getElementById('loadData').onclick = () => { try { pad.fromData(JSON.parse(data.textContent)); status.textContent = pad.isEmpty() ? 'Empty' : 'Loaded'; } catch (e) { status.textContent = 'Invalid stroke JSON'; } };
+window.addEventListener('resize', () => pad.resize());
+</script>
+</body>
+</html>
