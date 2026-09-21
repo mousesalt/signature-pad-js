@@ -1,0 +1,31 @@
+{
+  "name": "smooth-signature-pad",
+  "version": "1.0.0",
+  "description": "Lightweight dependency-free HTML5 canvas signature pad with pressure-aware strokes.",
+  "main": "signature-pad.js",
+  "type": "commonjs",
+  "license": "MIT",
+  "homepage": "https://mousesalt.github.io/signature-pad-js/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mousesalt/signature-pad-js.git"
+  },
+  "keywords": [
+    "signature",
+    "signature-pad",
+    "canvas",
+    "html5",
+    "drawing",
+    "pointer-events",
+    "stylus"
+  ],
+  "author": "mousesalt",
+  "files": [
+    "signature-pad.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "check": "node --check signature-pad.js"
+  }
+}
