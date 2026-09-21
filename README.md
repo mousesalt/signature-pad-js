@@ -104,4 +104,4 @@ Modern browsers expose pointer pressure through Pointer Events. Mouse input usua
 
 ## License
 
-MIT © 2026 mousesalt
+MIT © 2026 FARIDZOEL MOSSAL
